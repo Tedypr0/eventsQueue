@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,9 +22,9 @@ public class EventHandler extends Thread {
     public void run() {
         while (!isPoisonFound.get()) {
             try {
-                Event event = Main.peekPoll(eventsQueue, this);
+                Event event = SideStuff.peekPoll(eventsQueue, this);
                 if (event != null) {
-                    System.out.printf(String.format("Event message: %s processed by thread %d%n",event.getMessage(), threadNumber));
+                   System.out.printf(String.format("Event message: %s processed by thread %d%n", event.getMessage(), threadNumber));
                     references.get(threadNumber).set(0);
                 }
             } catch (InterruptedException e) {
