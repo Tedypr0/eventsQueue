@@ -33,25 +33,7 @@ public class EventHandler extends Thread {
         }
     }
 
-    @Override
-    public int hashCode() {
-        int prime = 31;
-        return prime + ((this.getName() == null) ? 0 : this.getName().hashCode());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof EventHandler)) {
-            return false;
-        }
-        EventHandler eventHandler = new EventHandler(eventsQueue, threadNumber, new AtomicBoolean(false), references);
-        return (eventHandler.getName().equals(this.getName()));
-    }
-
-    public int getThreadNumber() {
+        public int getThreadNumber() {
         return threadNumber;
     }
 }
