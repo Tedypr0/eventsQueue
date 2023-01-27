@@ -23,7 +23,7 @@ public class EventHandler extends Thread {
             try {
                 Event event = SideStuff.peekPoll(eventsQueue, this);
                 if (event != null) {
-                   System.out.printf(String.format("Event message: %s processed by thread %d%n", event.getMessage(), threadNumber));
+                    System.out.printf(String.format("Event message: %s processed by thread %d%n", event.getMessage(), threadNumber));
                     references.get(threadNumber).set(0);
                 }
             } catch (InterruptedException e) {
@@ -32,7 +32,7 @@ public class EventHandler extends Thread {
         }
     }
 
-        public int getThreadNumber() {
+    public int getThreadNumber() {
         return threadNumber;
     }
 }
