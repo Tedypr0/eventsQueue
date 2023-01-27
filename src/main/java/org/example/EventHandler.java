@@ -9,19 +9,21 @@ public class EventHandler extends Thread {
     private final int threadNumber;
     static AtomicBoolean isPoisonFound = null;
     private final List<AtomicInteger> references;
+    private final SideStuff sideStuffLogic;
 
-    public EventHandler(EventsQueue<Event> eventsQueue, int threadNumber, AtomicBoolean isPoisonFound, List<AtomicInteger> references) {
+    public EventHandler(EventsQueue<Event> eventsQueue, int threadNumber, AtomicBoolean isPoisonFound, List<AtomicInteger> references, SideStuff sideStuffLogic) {
         this.eventsQueue = eventsQueue;
         this.threadNumber = threadNumber;
         EventHandler.isPoisonFound = isPoisonFound;
         this.references = references;
+        this.sideStuffLogic = sideStuffLogic;
     }
 
     @Override
     public void run() {
         while (!isPoisonFound.get()) {
             try {
-                Event event = SideStuff.peekPoll(eventsQueue, this);
+                Event event = sideStuffLogic.peekPoll(eventsQueue, this);
                 if (event != null) {
                     System.out.printf(String.format("Event message: %s processed by thread %d%n", event.getMessage(), threadNumber));
                     references.get(threadNumber).set(0);

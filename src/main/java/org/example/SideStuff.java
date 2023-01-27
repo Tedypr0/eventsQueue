@@ -9,7 +9,7 @@ public class SideStuff {
     private static final int THREAD_NUMBER = 4;
     public static final String POISON_MESSAGE = "!@#$%^&*()POISON_PILL";
     static AtomicBoolean isPoisonFound = new AtomicBoolean(false);
-    static List<AtomicInteger> threadReferences = new ArrayList<>(THREAD_NUMBER);
+    List<AtomicInteger> threadReferences = new ArrayList<>(THREAD_NUMBER);
     List<EventHandler> threads = new ArrayList<>();
     EventsQueue<Event> eventsQueue = new EventsQueue<>(30);
 
@@ -31,13 +31,13 @@ public class SideStuff {
         }
 
         for (int i = 0; i < THREAD_NUMBER; i++) {
-            EventHandler eventHandler = new EventHandler(eventsQueue, i, isPoisonFound, threadReferences);
+            EventHandler eventHandler = new EventHandler(eventsQueue, i, isPoisonFound, threadReferences, this);
             threads.add(eventHandler);
             threads.get(i).start();
         }
     }
 
-    public static synchronized Event peekPoll(EventsQueue<Event> queue, EventHandler currentThread) throws InterruptedException {
+    public synchronized Event peekPoll(EventsQueue<Event> queue, EventHandler currentThread) throws InterruptedException {
         Event peekedEvent = queue.peek();
         if (peekedEvent.getMessage().equals(POISON_MESSAGE)) {
             isPoisonFound.set(true);
@@ -47,7 +47,7 @@ public class SideStuff {
                 boolean isPeekEventFound = false;
                 Event savedEvent = null;
                 for (Event event : queue.getUniqueValues()) {
-                    for (AtomicInteger threadReference : threadReferences) {
+                    for (AtomicInteger threadReference : this.getThreadReferences()) {
                         if (threadReference.get() == peekedEvent.hashCode() && !isPeekEventFound) {
                             isPeekEventFound = true;
                         }
@@ -74,5 +74,9 @@ public class SideStuff {
 
         }
         return null;
+    }
+
+    public synchronized List<AtomicInteger> getThreadReferences(){
+        return threadReferences;
     }
 }
