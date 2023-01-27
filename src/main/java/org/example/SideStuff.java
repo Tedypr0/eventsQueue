@@ -48,7 +48,7 @@ public class SideStuff {
                 Event savedEvent = null;
                 for (Event event : queue.getUniqueValues()) {
                     for (AtomicInteger threadReference : threadReferences) {
-                        if (threadReference.get() == peekedEvent.hashCode()) {
+                        if (threadReference.get() == peekedEvent.hashCode() && !isPeekEventFound) {
                             isPeekEventFound = true;
                         }
                         if (threadReference.get() == event.hashCode()) {
@@ -57,19 +57,15 @@ public class SideStuff {
                             savedEvent = event;
                         }
                     }
-                    if (isPeekEventFound && !isNextEventFound) {
+                    //This is dumb. Must be changed.
+                    if (!isPeekEventFound) {
                         Event eventToProcess = queue.poll();
-                        System.out.printf(String.format("Thread: %s has polled task: %s%n", currentThread.getThreadNumber(), eventToProcess.getMessage()));
+                        //  System.out.printf(String.format("Thread: %s has polled task: %s%n", currentThread.getThreadNumber(), eventToProcess.getMessage()));
                         threadReferences.get(currentThread.getThreadNumber()).set(eventToProcess.hashCode());
                         return eventToProcess;
-                    } else if (!isPeekEventFound && isNextEventFound) {
+                    } else if (!isNextEventFound) {
                         Event eventToProcess = queue.removeSpecificElement(savedEvent);
-                        System.out.printf(String.format("Thread: %s has removed task: %s%n", currentThread.getThreadNumber(), eventToProcess.getMessage()));
-                        threadReferences.get(currentThread.getThreadNumber()).set(eventToProcess.hashCode());
-                        return eventToProcess;
-                    } else if (!isPeekEventFound) {
-                        Event eventToProcess = queue.poll();
-                        System.out.printf(String.format("Thread: %s has polled task: %s%n", currentThread.getThreadNumber(), eventToProcess.getMessage()));
+                        //   System.out.printf(String.format("Thread: %s has removed specific task: %s%n", currentThread.getThreadNumber(), eventToProcess.getMessage()));
                         threadReferences.get(currentThread.getThreadNumber()).set(eventToProcess.hashCode());
                         return eventToProcess;
                     }
