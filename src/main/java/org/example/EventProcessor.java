@@ -18,8 +18,6 @@ public class EventProcessor extends Thread {
         while (!isPoisonFound.get()) {
             try {
                 Helper.peekPoll(queue);
-
-               // sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException();
             }
