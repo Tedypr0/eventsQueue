@@ -15,23 +15,14 @@ public class EventProcessor extends Thread {
 
     @Override
     public void run() {
-        Event event;
         while (!isPoisonFound.get()) {
             try {
-                event = Helper.peekPoll(queue, this);
-                print(event);
-                sleep(5000);
+                Helper.peekPoll(queue);
+
+               // sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException();
             }
         }
     }
-
-    private synchronized void print(Event event) {
-        if (event != null) {
-            System.out.printf("Thread %s successfully finished %s with key %d%n", this.getName(), event.getMessage(), event.getId());
-        }
-    }
-
-
 }
