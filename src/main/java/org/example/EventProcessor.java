@@ -17,7 +17,7 @@ public class EventProcessor extends Thread {
     public void run() {
         while (!isPoisonFound.get()) {
             try {
-                Helper.peekPoll(queue);
+                Helper.peekPoll(queue,this);
             } catch (InterruptedException e) {
                 throw new RuntimeException();
             }

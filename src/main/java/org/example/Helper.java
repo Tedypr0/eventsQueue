@@ -26,7 +26,7 @@ public class Helper {
             if (j % 5 == 0) {
                 i++;
             }
-            queue.add(new Event(j, String.format("Event %d %d", i, j)));
+            queue.add(new Event(i, String.format("Event %d %d", i, j)));
         }
         queue.add(new Event(Integer.MAX_VALUE, POISON_MESSAGE));
     }
@@ -38,9 +38,9 @@ public class Helper {
         }
     }
 
-    public static synchronized void peekPoll(UniqueEventsQueue<Event> queue) throws InterruptedException {
+    public static synchronized void peekPoll(UniqueEventsQueue<Event> queue, EventProcessor currentThread) throws InterruptedException {
         int key = queue.peek().getId();
-        // System.out.printf("Checking if thread %s can access %s with key %d%n", currentThread.getName(), queue.peek().getMessage(),key);
+//         System.out.printf("Checking if thread %s can access %s with key %d%n", currentThread.getName(), queue.peek().getMessage(),key);
 //        if(keys.containsKey(key)){
 //            System.out.printf("%s cannot work with event %s, because another thread is working with it already! KEY: %d%n", currentThread.getName(), queue.peek().getMessage(), key);
 //        }else{
@@ -51,7 +51,7 @@ public class Helper {
         try {
             if (queue.peek().getMessage().equals(POISON_MESSAGE)) {
                 isPoisonFound.set(true);
-                // System.out.println("IsPoisonFound has been set to TRUE!");
+           //     System.out.println("IsPoisonFound has been set to TRUE!");
             } else {
                 System.out.println();
                 Event peek = queue.peek();
@@ -60,7 +60,7 @@ public class Helper {
             }
         } finally {
             lock.unlock();
-            //System.out.printf("Thread %s unlocked key %d!%n", currentThread.getName(), key);
+         //   System.out.printf("Thread %s unlocked key %d!%n", currentThread.getName(), key);
         }
     }
 
