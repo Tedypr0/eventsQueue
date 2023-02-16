@@ -1,19 +1,30 @@
 package org.example;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class UniqueEventsQueue<T> {
-    private final Queue<T> queue;
+    private final Map<Integer, Queue<T>> storageMap = new ConcurrentHashMap<>();
+    private final Map<Integer, T> eventsInQueueMap = new ConcurrentHashMap<>();
+    private final Queue<T> queue = new ConcurrentLinkedQueue<>();
     private int size;
 
-    public UniqueEventsQueue() {
-        queue = new ConcurrentLinkedQueue<>();
-    }
-
     public synchronized void add(T element) {
-        queue.add(element);
+        if (eventsInQueueMap.containsKey(element.hashCode())) {
+            if (storageMap.containsKey(element.hashCode())) {
+                Queue<T> list = storageMap.get(element.hashCode());
+                list.add(element);
+                storageMap.put(element.hashCode(), list);
+            } else {
+                Queue<T> list = new ConcurrentLinkedQueue<>();
+                list.add(element);
+                storageMap.put(element.hashCode(), list);
+            }
+        } else {
+            eventsInQueueMap.put(element.hashCode(), element);
+            queue.add(element);
+        }
         size++;
         notifyAll();
     }
@@ -22,9 +33,19 @@ public class UniqueEventsQueue<T> {
         while (queue.isEmpty()) {
             wait();
         }
-        size--;
-        notify();
-        return queue.poll();
+
+        T element = queue.poll();
+        if (element != null) {
+            if (storageMap.containsKey(element.hashCode())) {
+                Queue<T> events = storageMap.get(element.hashCode());
+                queue.add(events.poll());
+            }
+            eventsInQueueMap.remove(element.hashCode());
+            size--;
+            notify();
+            return element;
+        }
+        return null;
     }
 
     public synchronized T peek() throws InterruptedException {
@@ -33,5 +54,4 @@ public class UniqueEventsQueue<T> {
         }
         return queue.peek();
     }
-
 }

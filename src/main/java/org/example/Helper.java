@@ -42,9 +42,9 @@ public class Helper {
         int key = queue.peek().getId();
         System.out.printf("Checking if thread %s can access %s with key %d%n", currentThread.getName(), queue.peek().getMessage(),key);
         if(keys.containsKey(key)){
-            System.out.printf("Thread %s cannot work with event %s, because another thread is working with it already! KEY: %d%n", currentThread.getName(), queue.peek().getMessage(), key);
+            System.out.printf("%s cannot work with event %s, because another thread is working with it already! KEY: %d%n", currentThread.getName(), queue.peek().getMessage(), key);
         }else{
-            System.out.printf("Thread %s took event %s!%n", currentThread.getName(), queue.peek().getMessage());
+            System.out.printf("%s took event %s!%n", currentThread.getName(), queue.peek().getMessage());
         }
         ReentrantLock lock = keys.computeIfAbsent(key, k -> new ReentrantLock());
         lock.lock();

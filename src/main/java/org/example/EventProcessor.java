@@ -20,7 +20,7 @@ public class EventProcessor extends Thread {
             try {
                 event = Helper.peekPoll(queue, this);
                 print(event);
-                sleep(1000);
+                sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException();
             }
