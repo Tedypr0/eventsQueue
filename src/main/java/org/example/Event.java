@@ -1,9 +1,7 @@
 package org.example;
 
-
 public class Event {
     private final int id;
-
     private final String message;
 
     public Event(int id, String message) {

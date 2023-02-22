@@ -1,7 +1,6 @@
 package org.example;
 
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -36,7 +35,6 @@ public class EventProcessor extends Thread {
                         if (event.hashCode() != Integer.MAX_VALUE) {
                             System.out.println(event.getMessage());
                         }
-
                     }
                 } finally {
                     lock.unlock();

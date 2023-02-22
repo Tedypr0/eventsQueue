@@ -16,10 +16,10 @@ public class Helper {
     private static UniqueEventsQueue<Event> queue = null;
     private static final List<EventProcessor> threads = new ArrayList<>();
     private static final Map<Integer, ReentrantLock> keys = new ConcurrentHashMap<>();
-    private final Queue<Event> workerQueue = new ConcurrentLinkedQueue<>();
 
     public Helper() {
         isPoisonFound = new AtomicBoolean(false);
+        Queue<Event> workerQueue = new ConcurrentLinkedQueue<>();
         queue = new UniqueEventsQueue<>(workerQueue);
     }
 
