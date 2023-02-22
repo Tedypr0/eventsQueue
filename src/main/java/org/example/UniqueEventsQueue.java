@@ -12,15 +12,15 @@ public class UniqueEventsQueue<T> {
     private final Map<Integer, Queue<T>> storageMap = new ConcurrentHashMap<>();
     private final Map<Integer, T> eventsInQueueMap = new ConcurrentHashMap<>();
     private final Queue<T> workerQueue;
+
+    // size is the number of elements inside each queue in storageMap.
     private volatile int size;
 
     public UniqueEventsQueue(Queue<T> workerQueue) {
         this.workerQueue = workerQueue;
     }
 
-    /*
-     *  Check if an Event is inside the queue. If it IS add it to the storage, if not add it to the workerQueue and eventsInQueueMap.
-     */
+    //   Check if an Event is inside the queue. If it IS add it to the storage, if not add it to the workerQueue and eventsInQueueMap.
 
     public synchronized void add(T element) {
         // Processing poisonous Event
@@ -50,7 +50,6 @@ public class UniqueEventsQueue<T> {
             eventsInQueueMap.put(element.hashCode(), element);
             workerQueue.add(element);
         }
-
     }
 
     public synchronized T poll() throws InterruptedException {
@@ -58,10 +57,10 @@ public class UniqueEventsQueue<T> {
             wait();
         }
 
-        T element = workerQueue.peek();
+        T element = workerQueue.poll();
 
         // Adding poisonous Event to queue.
-        if (size == 0 && storageMap.containsKey(Integer.MAX_VALUE)) {
+        if (size == 1 && storageMap.containsKey(Integer.MAX_VALUE)) {
             workerQueue.add(storageMap.get(Integer.MAX_VALUE).peek());
         } else {
             // Adding every other event to queue.
@@ -72,12 +71,13 @@ public class UniqueEventsQueue<T> {
                     workerQueue.add(elementFromStorage);
                 } else {
                     eventsInQueueMap.remove(element.hashCode());
+                    return element;
                 }
             }
         }
         size--;
         notify();
-        return workerQueue.poll();
+        return element;
     }
 
     public synchronized T peek() throws InterruptedException {
