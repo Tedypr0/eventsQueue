@@ -24,7 +24,7 @@ public class Event {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return id == event.id && message.equals(event.message);
+        return id == event.id;
     }
 
     @Override
