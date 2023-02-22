@@ -33,11 +33,7 @@ public class EventProcessor extends Thread {
                         isPoisonFound.set(true);
                     } else {
                         Event event = queue.poll();
-                        if(event==null){
-                            return;
-                        }
                         if (event.hashCode() != Integer.MAX_VALUE) {
-                           // System.out.println();
                             System.out.println(event.getMessage());
                         }
 

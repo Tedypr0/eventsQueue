@@ -23,6 +23,7 @@ public class UniqueEventsQueue<T> {
      */
 
     public synchronized void add(T element) {
+        // Processing poisonous Event
         if (element.hashCode() == Integer.MAX_VALUE) {
             Queue<T> poisonQueue = new ConcurrentLinkedQueue<>();
             poisonQueue.add(element);
@@ -32,6 +33,7 @@ public class UniqueEventsQueue<T> {
             return;
         }
 
+        // Processing any other events.
         if (eventsInQueueMap.containsKey(element.hashCode())) {
             if (storageMap.containsKey(element.hashCode())) {
                 Queue<T> list = storageMap.get(element.hashCode());
@@ -58,10 +60,11 @@ public class UniqueEventsQueue<T> {
 
         T element = workerQueue.peek();
 
+        // Adding poisonous Event to queue.
         if (size == 0 && storageMap.containsKey(Integer.MAX_VALUE)) {
             workerQueue.add(storageMap.get(Integer.MAX_VALUE).peek());
         } else {
-
+            // Adding every other event to queue.
             if (element != null) {
                 Queue<T> queueToCheck = storageMap.get(element.hashCode());
                 if (queueToCheck != null && !queueToCheck.isEmpty()) {
@@ -71,14 +74,10 @@ public class UniqueEventsQueue<T> {
                     eventsInQueueMap.remove(element.hashCode());
                 }
             }
-            size--;
-            notify();
-
-            return workerQueue.poll();
         }
-
-        // Will return null every time the workerQueue has the last element.
-        return null;
+        size--;
+        notify();
+        return workerQueue.poll();
     }
 
     public synchronized T peek() throws InterruptedException {

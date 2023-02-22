@@ -24,12 +24,12 @@ public class Helper {
     }
 
     public void eventCreation() {
-            for (int i = 0; i <= 3; i++) {
-                for (int j = 0; j <= 3; j++) {
-                    queue.add(new Event(i, String.format("Event %d %d", i, j)));
-                }
+        for (int i = 0; i <= 3; i++) {
+            for (int j = 0; j <= 3; j++) {
+                queue.add(new Event(i, String.format("Event %d %d", i, j)));
             }
-       queue.add(new Event(Integer.MAX_VALUE, POISON_MESSAGE));
+        }
+        queue.add(new Event(Integer.MAX_VALUE, POISON_MESSAGE));
     }
 
     public void threadCreation() {
