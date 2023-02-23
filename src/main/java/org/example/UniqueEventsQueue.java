@@ -10,7 +10,7 @@ public class UniqueEventsQueue<T> {
      * so we know when an Event has been accepted by a Thread, so we can add an Event with the same key to the queue.
      */
     private final Map<Integer, Queue<T>> storageMap = new ConcurrentHashMap<>();
-   // Keeps track of Events in queue. (Mirrored)
+    // Keeps track of Events in queue. (Mirrored)
     private final Map<Integer, T> eventsInQueueMap = new ConcurrentHashMap<>();
     private final Queue<T> workerQueue;
 
@@ -73,7 +73,7 @@ public class UniqueEventsQueue<T> {
                     eventsInQueueMap.remove(element.hashCode());
                     return workerQueue.poll();
                 }
-            }else return null;
+            } else return null;
         }
         size--;
         notify();

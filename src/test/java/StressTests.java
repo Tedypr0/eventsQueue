@@ -8,12 +8,12 @@ public class StressTests {
     Helper helper;
 
     @BeforeEach
-    public void initialize(){
+    public void initialize() {
         helper = new Helper();
     }
 
     @RepeatedTest(25000)
-    public void stressTest_shouldAlways_EndProgram_gracefully(){
+    public void stressTest_shouldAlways_EndProgram_gracefully() {
         helper.eventCreation();
         helper.threadCreation();
     }

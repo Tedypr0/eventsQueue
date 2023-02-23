@@ -9,8 +9,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static java.lang.Thread.sleep;
-
 public class Helper {
     static final String POISON_MESSAGE = "POISON_MESSAGE";
     private static final int THREAD_NUMBER = 4;
@@ -37,35 +35,8 @@ public class Helper {
 
     public void threadCreation() {
         for (int i = 0; i < THREAD_NUMBER; i++) {
-            threads.add(new EventProcessor(isPoisonFound, queue, keys));
+            threads.add(new EventProcessor(isPoisonFound, queue, keys, syncLock));
             threads.get(i).start();
-        }
-    }
-
-    public static void peekPoll(EventProcessor thread) throws InterruptedException{
-        ReentrantLock lock = null;
-        int key = 0;
-        Event event;
-        try {
-            synchronized (syncLock) {
-                key = queue.peek().getId();
-                lock = keys.computeIfAbsent(key, k -> new ReentrantLock());
-                lock.lock();
-                System.out.printf("%s locked key: %d%n", thread.getName(), key);
-                isPoisonFound.set(queue.peek().getMessage().equals(POISON_MESSAGE));
-                event = queue.poll();
-            }
-                if (event != null) {
-                    boolean isPoisonFound = event.hashCode() == Integer.MAX_VALUE;
-                    if (!isPoisonFound) {
-                        System.out.printf("%s processed %s with key %d%n", thread.getName(), event.getMessage(), event.getId());
-                    }
-                }
-
-        } finally {
-            assert lock != null;
-            lock.unlock();
-            System.out.printf("%s unlocked key: %d%n",thread.getName(), key);
         }
     }
 }
