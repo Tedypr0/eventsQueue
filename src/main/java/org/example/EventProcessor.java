@@ -22,13 +22,14 @@ public class EventProcessor extends Thread {
     public void run() {
         while (!isPoisonFound.get()) {
             try {
-                /* key might be accessed by multiple threads, but a thread will lock this key and
-                 * when it gets polled, other threads will see a different object when they call peek()
-                 */
                 ReentrantLock lock = null;
                 int key = 0;
                 Event event;
                 try {
+                    /*
+                     * The idea of the synchronized block is to verify that locking events will be done only by 1 thread,
+                     * at a time. When an Event is polled, another thread can poll too if the lock is not being used.
+                     */
                     synchronized (syncLock) {
                         key = queue.peek().getId();
                         lock = keys.computeIfAbsent(key, k -> new ReentrantLock());
