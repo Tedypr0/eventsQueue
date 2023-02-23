@@ -10,6 +10,7 @@ public class UniqueEventsQueue<T> {
      * so we know when an Event has been accepted by a Thread, so we can add an Event with the same key to the queue.
      */
     private final Map<Integer, Queue<T>> storageMap = new ConcurrentHashMap<>();
+   // Keeps track of Events in queue. (Mirrored)
     private final Map<Integer, T> eventsInQueueMap = new ConcurrentHashMap<>();
     private final Queue<T> workerQueue;
 
@@ -20,10 +21,9 @@ public class UniqueEventsQueue<T> {
         this.workerQueue = workerQueue;
     }
 
-    //   Check if an Event is inside the queue. If it IS add it to the storage, if not add it to the workerQueue and eventsInQueueMap.
-
+    //   Check if an Event is inside the queue. If it IS, add it to the storage, if not add it to the workerQueue and eventsInQueueMap.
     public synchronized void add(T element) {
-        // Processing poisonous Event
+        // Adding poisonous Event
         if (element.hashCode() == Integer.MAX_VALUE) {
             Queue<T> poisonQueue = new ConcurrentLinkedQueue<>();
             poisonQueue.add(element);
@@ -33,7 +33,7 @@ public class UniqueEventsQueue<T> {
             return;
         }
 
-        // Processing any other events.
+        // Adding any other events.
         if (eventsInQueueMap.containsKey(element.hashCode())) {
             if (storageMap.containsKey(element.hashCode())) {
                 Queue<T> list = storageMap.get(element.hashCode());
