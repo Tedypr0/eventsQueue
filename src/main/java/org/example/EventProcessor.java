@@ -24,21 +24,7 @@ public class EventProcessor extends Thread {
                 /* key might be accessed by multiple threads, but a thread will lock this key and
                  * when it gets polled, other threads will see a different object when they call peek()
                  */
-                int key = queue.peek().getId();
-                ReentrantLock lock = keys.computeIfAbsent(key, k -> new ReentrantLock());
-                lock.lock();
-                try {
-                    if (queue.peek().getMessage().equals(POISON_MESSAGE)) {
-                        isPoisonFound.set(true);
-                    } else {
-                        Event event = queue.poll();
-                        if (event.hashCode() != Integer.MAX_VALUE) {
-                            System.out.println(event.getMessage());
-                        }
-                    }
-                } finally {
-                    lock.unlock();
-                }
+              Helper.peekPoll(this);
             } catch (InterruptedException e) {
                 throw new RuntimeException();
             }

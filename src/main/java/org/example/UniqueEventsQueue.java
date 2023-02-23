@@ -57,10 +57,10 @@ public class UniqueEventsQueue<T> {
             wait();
         }
 
-        T element = workerQueue.poll();
+        T element = workerQueue.peek();
 
         // Adding poisonous Event to queue.
-        if (size == 1 && storageMap.containsKey(Integer.MAX_VALUE)) {
+        if (size <= 1 && storageMap.containsKey(Integer.MAX_VALUE)) {
             workerQueue.add(storageMap.get(Integer.MAX_VALUE).peek());
         } else {
             // Adding every other event to queue.
@@ -71,13 +71,13 @@ public class UniqueEventsQueue<T> {
                     workerQueue.add(elementFromStorage);
                 } else {
                     eventsInQueueMap.remove(element.hashCode());
-                    return element;
+                    return workerQueue.poll();
                 }
-            }
+            }else return null;
         }
         size--;
         notify();
-        return element;
+        return workerQueue.poll();
     }
 
     public synchronized T peek() throws InterruptedException {
