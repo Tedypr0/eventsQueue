@@ -11,13 +11,10 @@ public class EventProcessor extends Thread {
     private final AtomicBoolean isPoisonFound;
     private final UniqueEventsQueue<Event> queue;
     private final Map<Integer, ReentrantLock> keys;
-    private final AtomicInteger eventCounter;
-
-    public EventProcessor(AtomicBoolean isPoisonFound, UniqueEventsQueue<Event> queue, Map<Integer, ReentrantLock> keys, AtomicInteger eventCounter) {
+    public EventProcessor(AtomicBoolean isPoisonFound, UniqueEventsQueue<Event> queue, Map<Integer, ReentrantLock> keys) {
         this.isPoisonFound = isPoisonFound;
         this.queue = queue;
         this.keys = keys;
-        this.eventCounter = eventCounter;
     }
 
     @Override
@@ -26,6 +23,7 @@ public class EventProcessor extends Thread {
             try {
                 ReentrantLock lock = null;
                 int key = 0;
+                isPoisonFound.set(queue.peek().getMessage().equals(POISON_MESSAGE));
                 Event event;
                 try {
                     /*
@@ -36,12 +34,11 @@ public class EventProcessor extends Thread {
                     lock = keys.computeIfAbsent(key, k -> new ReentrantLock());
                     lock.lock();
                     System.out.printf("%s locked key: %d%n", this.getName(), key);
-                    isPoisonFound.set(queue.peek().getMessage().equals(POISON_MESSAGE));
+
                     queue.poll();
-                    eventCounter.getAndIncrement();
                 } finally {
                     assert lock != null;
-                    System.out.printf("%s unlocked key: %d%n", this.getName(), key);
+                   System.out.printf("%s unlocked key: %d%n", this.getName(), key);
                     lock.unlock();
 
                 }
@@ -49,6 +46,5 @@ public class EventProcessor extends Thread {
                 throw new RuntimeException();
             }
         }
-        System.out.println(eventCounter.get());
     }
 }

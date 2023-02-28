@@ -17,7 +17,6 @@ public class Helper {
     private static UniqueEventsQueue<Event> queue = null;
     private final List<EventProcessor> threads = new ArrayList<>();
     private static final Map<Integer, ReentrantLock> keys = new ConcurrentHashMap<>();
-    private final AtomicInteger counter = new AtomicInteger(0);
 
     public Helper() {
         isPoisonFound = new AtomicBoolean(false);
@@ -40,7 +39,7 @@ public class Helper {
 
     public void threadCreation() {
         for (int i = 0; i < THREAD_NUMBER; i++) {
-            threads.add(new EventProcessor(isPoisonFound, queue, keys, counter));
+            threads.add(new EventProcessor(isPoisonFound, queue, keys));
             threads.get(i).start();
         }
     }
