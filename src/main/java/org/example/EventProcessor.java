@@ -25,11 +25,6 @@ public class EventProcessor extends Thread {
                 int key = 0;
                 Event event = queue.poll();
                 try {
-                    /*
-                     * The idea of the synchronized block is to verify that locking events will be done only by 1 thread,
-                     * at a time. When an Event is polled, another thread can poll too if the lock is not being used.
-                     */
-
                     isPoisonFound.set(event.getMessage().equals(POISON_MESSAGE));
                     key = event.getId();
                     lock = keys.computeIfAbsent(key, k -> new ReentrantLock());
