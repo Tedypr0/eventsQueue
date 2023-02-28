@@ -45,11 +45,11 @@ public class UniqueEventsQueue<T> {
                 storageMap.put(element.hashCode(), list);
             }
             size++;
-            notifyAll();
         } else {
             eventsInQueueMap.put(element.hashCode(), element);
             workerQueue.add(element);
         }
+        notifyAll();
     }
 
     public synchronized T poll() throws InterruptedException {

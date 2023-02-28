@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Helper {
@@ -16,7 +17,7 @@ public class Helper {
     private static UniqueEventsQueue<Event> queue = null;
     private final List<EventProcessor> threads = new ArrayList<>();
     private static final Map<Integer, ReentrantLock> keys = new ConcurrentHashMap<>();
-    private static final Object syncLock = new Object();
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     public Helper() {
         isPoisonFound = new AtomicBoolean(false);
@@ -25,17 +26,21 @@ public class Helper {
     }
 
     public void eventCreation() {
-        for (int i = 0; i <= 3; i++) {
-            for (int j = 0; j <= 3; j++) {
-                queue.add(new Event(i, String.format("Event %d %d", i, j)));
+            for (int j = 0; j <= 1000; j++) {
+                queue.add(new Event(0, String.format("Event %d %d", 0, j)));
             }
-        }
+
+            for(int i = 1; i< 5; i++){
+                for (int j = 0; j< 100; j++){
+                    queue.add(new Event(i, String.format("Event %d %d", i, j)));
+                }
+            }
         queue.add(new Event(Integer.MAX_VALUE, POISON_MESSAGE));
     }
 
     public void threadCreation() {
         for (int i = 0; i < THREAD_NUMBER; i++) {
-            threads.add(new EventProcessor(isPoisonFound, queue, keys, syncLock));
+            threads.add(new EventProcessor(isPoisonFound, queue, keys, counter));
             threads.get(i).start();
         }
     }
