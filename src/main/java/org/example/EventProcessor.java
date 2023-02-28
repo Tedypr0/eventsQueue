@@ -23,8 +23,7 @@ public class EventProcessor extends Thread {
         while (!isPoisonFound.get()) {
             try {
                 ReentrantLock lock = null;
-                int key = 0;
-                Event event;
+                int key;
                 try {
                     /*
                      * The idea of the synchronized block is to verify that locking events will be done only by 1 thread,
@@ -34,20 +33,12 @@ public class EventProcessor extends Thread {
                         key = queue.peek().getId();
                         lock = keys.computeIfAbsent(key, k -> new ReentrantLock());
                         lock.lock();
-                        System.out.printf("%s locked key: %d%n", this.getName(), key);
                         isPoisonFound.set(queue.peek().getMessage().equals(POISON_MESSAGE));
-                        event = queue.poll();
-                    }
-                    if (event != null) {
-                        boolean isPoisonFound = event.hashCode() == Integer.MAX_VALUE;
-                        if (!isPoisonFound) {
-                            System.out.printf("%s processed %s with key %d%n", this.getName(), event.getMessage(), event.getId());
-                        }
+                        queue.poll();
                     }
                 } finally {
                     assert lock != null;
                     lock.unlock();
-                    System.out.printf("%s unlocked key: %d%n",this.getName(), key);
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException();
