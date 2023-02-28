@@ -1,8 +1,7 @@
 package org.example;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.example.Helper.POISON_MESSAGE;
@@ -33,10 +32,10 @@ public class EventProcessor extends Thread {
                 } finally {
                     assert lock != null;
                     /* Sleep is for testing purposes. We may have Events with different processing times.
-                     * With sleep we can check if all of our threads will get an event to work with from the queue.
+                     * With sleep() we can check if all of our threads will get an event to work with from the queue.
                      */
 
-                    sleep(1000);
+                    sleep(50);
                     System.out.printf("%s unlocked key: %d%n", this.getName(), key);
                     lock.unlock();
 
